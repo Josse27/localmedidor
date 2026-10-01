@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Busca Instalação / Medidor</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #f9f9f9;
+    }
+
+    .container {
+      text-align: center;
+      width: 90%;
+      max-width: 500px;
+    }
+
+    input {
+      padding: 12px;
+      width: 65%;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    button {
+      padding: 12px 18px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #resultado {
+      margin-top: 25px;
+      padding: 15px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      line-height: 1.8;
+    }
+
+    .mapa {
+      display: inline-block;
+      margin-top: 15px;
+      padding: 10px 15px;
+      background: #4285F4;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+
+    .mapa:hover {
+      background: #3367D6;
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <div class="container">
+
+```
+<h2>🔎 Buscar Instalação ou Medidor</h2>
+
+<input
+  type="text"
+  id="busca"
+  placeholder="Digite instalação ou medidor"
+  onkeypress="if(event.key === 'Enter') buscar()"
+>
+
+<button onclick="buscar()">Buscar</button>
+
+<div id="resultado"></div>
+```
+
+  </div>
+
+  <script>
+
+    // ==========================================
+    // DADOS DA PLANILHA
+    // ==========================================
+
+    const dados = [
+
+      {
+        instalacao: "305810",
+        latitude: "-6.760583333333",
+        longitude: "-37.22783",
+        medidor: "2221737361"
+      },
+
+      {
+        instalacao: "2267799",
+        latitude: "-6.747696666667",
+        longitude: "-37.247143333333",
+        medidor: "2222336590"
+      },
+
+      {
+        instalacao: "305811",
+        latitude: "-6.762991666667",
+        longitude: "-37.23987",
+        medidor: "5260084498"
+      },
+
+      {
+        instalacao: "2226927",
+        latitude: "-6.745701666667",
+        longitude: "-37.247366666667",
+        medidor: "2171045226"
+      },
+
+      {
+        instalacao: "305808",
+        latitude: "-6.745485",
+        longitude: "-37.247496666667",
+        medidor: "2190449311"
+      },
+
+      {
+        instalacao: "335499",
+        latitude: "-6.588571666667",
+        longitude: "-36.768761666667",
+        medidor: "2220625810"
+      },
+
+      {
+        instalacao: "335501",
+        latitude: "-6.588613333333",
+        longitude: "-36.768848333333",
+        medidor: "2140878955"
+      },
+
+      {
+        instalacao: "335502",
+        latitude: "-6.588645",
+        longitude: "-36.768943333333",
+        medidor: "2190921100"
+      }
+
+    ];
+
+
+    // ==========================================
+    // FUNÇÃO DE BUSCA
+    // ==========================================
+
+    function buscar() {
+
+      const termo = document
+        .getElementById("busca")
+        .value
+        .trim();
+
+      const item = dados.find(function(d) {
+
+        return d.instalacao === termo ||
+               d.medidor === termo;
+
+      });
+
+
+      // ==========================================
+      // SE ENCONTROU
+      // ==========================================
+
+      if (item) {
+
+        document.getElementById("resultado").innerHTML = `
+
+          <strong>Instalação:</strong>
+          ${item.instalacao}
+          <br>
+
+          <strong>Medidor:</strong>
+          ${item.medidor}
+          <br>
+
+          <strong>Latitude:</strong>
+          ${item.latitude}
+          <br>
+
+          <strong>Longitude:</strong>
+          ${item.longitude}
+          <br>
+
+          <a
+            class="mapa"
+            href="https://www.google.com/maps?q=${item.latitude},${item.longitude}"
+            target="_blank"
+          >
+            📍 Abrir no Google Maps
+          </a>
+
+        `;
+
+      }
+
+      // ==========================================
+      // SE NÃO ENCONTROU
+      // ==========================================
+
+      else {
+
+        document.getElementById("resultado").innerHTML = `
+          ❌ Instalação ou medidor não encontrado.
+        `;
+
+      }
+
+    }
+
+  </script>
+
+</body>
+</html>
