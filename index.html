@@ -46,17 +46,18 @@ function buscar(){
         return;
     }
     
-    let v = Object.values(a);
-    let inst = v[0];
-    let lat = fix(v[1]);
-    let lon = fix(v[2]);
-    let med = v[3];
+    // SOLUÇÃO: Mapeia diretamente o nome das chaves do seu JSON
+    let inst = a.Instalacao;       // Corrigido para o "I" maiúsculo do seu arquivo
+    let lat  = fix(a.latitude);   // Puxa direto pela propriedade 'latitude'
+    let lon  = fix(a.longitude);  // Puxa direto pela propriedade 'longitude'
+    let med  = a.medidor;         // Puxa direto pela propriedade 'medidor'
     
     div.innerHTML = '<b>Inst:</b> ' + inst + '<br><b>Med:</b> ' + med + '<br><b>Lat:</b> ' + lat + '<br><b>Long:</b> ' + lon + '<br><br>' +
-        '<button class="b" style="background:#25D366;color:#fff" onclick="window.open(\'https://www.google.com/maps?q=' + lat + ',' + lon + '\', \'_blank\')">📍 ABRIR NO MAPS</button>' +
-        '<button class="b" style="background:#33CCFF" onclick="window.open(\'https://waze.com/ul?ll=' + lat + ',' + lon + '&navigate=yes\', \'_blank\')">🔵 ABRIR NO WAZE</button>' +
+        '<button class="b" style="background:#25D366;color:#fff" onclick="window.open(\'https://google.com' + lat + ',' + lon + '\', \'_blank\')">📍 ABRIR NO MAPS</button>' +
+        '<button class="b" style="background:#33CCFF" onclick="window.open(\'https://waze.com' + lat + ',' + lon + '&navigate=yes\', \'_blank\')">🔵 ABRIR NO WAZE</button>' +
         '<button class="b" style="background:#eee" onclick="navigator.clipboard.writeText(\'' + lat + ',' + lon + '\');alert(\'Copiado: ' + lat + ',' + lon + '\')">📋 COPIAR</button>';
 }
+
 
 </script>
 </body>
