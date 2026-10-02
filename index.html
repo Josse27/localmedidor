@@ -17,19 +17,47 @@ let D=[];
 fetch('dados.json').then(r=>r.json()).then(j=>{D=j;document.getElementById('st').innerText=j.length.toLocaleString('pt-BR')+' registros';});
 function fix(v){let s=String(v).replace(',','.').trim();let p=s.split('.');if(p.length<=2)return s;let neg=s.startsWith('-')?'-':'';if(neg)p[0]=p[0].replace('-','');return neg+p[0]+'.'+p.slice(1).join('');}
 function buscar(){
- let q=document.getElementById('busca').value.trim();
- let div=document.getElementById('r');
- if(!q){div.style.display='block';div.innerHTML='Digite algo';return;}
- let a=null;for(let it of D){if(JSON.stringify(it).includes(q)){a=it;break;}}
- div.style.display='block';
- if(!a){div.innerHTML='❌ Não encontrado: '+q;return;}
- let v=Object.values(a);
- let inst=v[0];let lat=fix(v[1]);let lon=fix(v[2]);let med=v[3];
- div.innerHTML='<b>Inst:</b> '+inst+'<br><b>Med:</b> '+med+'<br><b>Lat:</b> '+lat+'<br><b>Long:</b> '+lon+'<br><br>'
- +'<button class="b" style="background:#25D366;color:#fff" onclick="window.open(\'https://www.google.com/maps?q='+lat+','+lon+'\', \'_blank\')">📍 ABRIR NO MAPS</button>'
- +'<button class="b" style="background:#33CCFF" onclick="window.open(\'https://waze.com/ul?ll='+lat+','+lon+'&navigate=yes\', \'_blank\')">🔵 ABRIR NO WAZE</button>'
- +'<button class="b" style="background:#eee" onclick="navigator.clipboard.writeText(\''+lat+','+lon+'\');alert(\'Copiado: '+lat+','+lon+'\')">📋 COPIAR</button>';
+    let q = document.getElementById('busca').value.trim().toLowerCase();
+    let div = document.getElementById('r');
+    
+    if(!q){
+        div.style.display = 'block';
+        div.innerHTML = 'Digite algo';
+        return;
+    }
+    
+    let a = null;
+    
+    // Varre os registros do JSON
+    for (let it of D) {
+        // Transforma os valores das propriedades em uma string minúscula para comparar
+        let valoresConcatenados = Object.values(it).join(' ').toLowerCase();
+        
+        if (valoresConcatenados.includes(q)) {
+            a = it;
+            break;
+        }
+    }
+    
+    div.style.display = 'block';
+    
+    if(!a){
+        div.innerHTML = '❌ Não encontrado: ' + document.getElementById('busca').value;
+        return;
+    }
+    
+    let v = Object.values(a);
+    let inst = v[0];
+    let lat = fix(v[1]);
+    let lon = fix(v[2]);
+    let med = v[3];
+    
+    div.innerHTML = '<b>Inst:</b> ' + inst + '<br><b>Med:</b> ' + med + '<br><b>Lat:</b> ' + lat + '<br><b>Long:</b> ' + lon + '<br><br>' +
+        '<button class="b" style="background:#25D366;color:#fff" onclick="window.open(\'https://www.google.com/maps?q=' + lat + ',' + lon + '\', \'_blank\')">📍 ABRIR NO MAPS</button>' +
+        '<button class="b" style="background:#33CCFF" onclick="window.open(\'https://waze.com/ul?ll=' + lat + ',' + lon + '&navigate=yes\', \'_blank\')">🔵 ABRIR NO WAZE</button>' +
+        '<button class="b" style="background:#eee" onclick="navigator.clipboard.writeText(\'' + lat + ',' + lon + '\');alert(\'Copiado: ' + lat + ',' + lon + '\')">📋 COPIAR</button>';
 }
+
 </script>
 </body>
 </html>
