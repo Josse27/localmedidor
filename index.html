@@ -57,45 +57,70 @@ function pega(item, nomes){
 }
 
 function buscar(){
-    const v=document.getElementById('busca').value.trim().toLowerCase();
-    const div=document.getElementById('resultado');
+    const v = document.getElementById('busca').value.trim().toLowerCase();
+    const div = document.getElementById('resultado');
     
     if(!v){
-        div.style.display='block';
-        div.innerHTML='⚠️ Digite algo para buscar';
+        div.style.display = 'block';
+        div.innerHTML = '⚠️ Digite algo para buscar';
         return;
     }
     
-    let achado=null;
+    let achado = null;
     for(let item of dados){
-        let inst=String(pega(item,['instalacao','inst','instal','codigo'])).trim().toLowerCase();
-        let med=String(pega(item,['medidor','med','numero_medidor'])).trim().toLowerCase();
+        let inst = String(pega(item,['instalacao','inst','instal','codigo'])).trim().toLowerCase();
+        let med = String(pega(item,['medidor','med','numero_medidor'])).trim().toLowerCase();
         
-        // Validação idêntica ou contida
-        if(inst===v || med===v || inst.includes(v) || med.includes(v)){
-            achado=item;
+        if(inst === v || med === v || inst.includes(v) || med.includes(v)){
+            achado = item;
             break;
         }
     }
     
-    div.style.display='block';
+    div.style.display = 'block';
     if(achado){
-        let inst=pega(achado,['instalacao','inst','instal','codigo']);
-        let lat=pega(achado,['latitude','lat','y']);
-        let lon=pega(achado,['longitude','long','lng','lon','x']);
-        let med=pega(achado,['medidor','med','numero_medidor']);
+        let inst = pega(achado,['instalacao','inst','instal','codigo']);
+        let med = pega(achado,['medidor','med','numero_medidor']);
         
-        div.innerHTML=`✅ <b>Encontrado:</b><br><br>
+        // Captura as coordenadas originais
+        let latOriginal = String(pega(achado,['latitude','lat','y'])).trim();
+        let lonOriginal = String(pega(achado,['longitude','long','lng','lon','x'])).trim();
+
+        // FUNÇÃO PARA CORRIGIR OS PONTOS EXTRAS:
+        // Mantém o sinal de menos se houver, e garante apenas o primeiro ponto decimal
+        const corrigirCoordenada = (numStr) => {
+            let sinal = numStr.startsWith('-') ? '-' : '';
+            let limpo = numStr.replace(/[^0-9]/g, ''); // Remove tudo que não for número
+            if (limpo.length > 1) {
+                // Se a coordenada original começava com zero (ex: -0.123), o comportamento muda.
+                // Mas para a sua região (Caicó: Lat -6..., Long -37...), o primeiro dígito é o correto antes do ponto:
+                let indicePonto = numStr.startsWith('-') ? 1 : 1; 
+                
+                // Se for Longitude -37, precisamos de 2 dígitos antes do ponto
+                if (limpo.startsWith('37') || limpo.startsWith('38')) {
+                    indicePonto = 2;
+                }
+                
+                return sinal + limpo.substring(0, indicePonto) + '.' + limpo.substring(indicePonto);
+            }
+            return numStr;
+        };
+
+        let lat = corrigirCoordenada(latOriginal);
+        let lon = corrigirCoordenada(lonOriginal);
+        
+        div.innerHTML = `✅ <b>Encontrado:</b><br><br>
         <b>Inst:</b> ${inst}<br>
         <b>Medidor:</b> ${med}<br>
         <b>Lat:</b> ${lat}<br>
         <b>Long:</b> ${lon}<br><br>
-        <a class="btn" href="https://www.google.com/maps?q=${lat},${lon}" target="_blank">📍 Maps</a> 
-        <a class="btn" style="background:#4285F4;margin-left:5px" href="https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}" target="_blank">🚗 Rota</a>`;
+        <a class="btn" href="https://google.com{lat},${lon}" target="_blank">📍 Maps</a> 
+        <a class="btn" style="background:#4285F4;margin-left:5px" href="https://google.com{lat},${lon}" target="_blank">🚗 Rota</a>`;
     } else {
-        div.innerHTML=`❌ Não encontrado: <b>${v}</b><br><small>Nenhuma instalação ou medidor correspondente</small>`;
+        div.innerHTML = `❌ Não encontrado: <b>${v}</b><br><small>Nenhuma instalação ou medidor correspondente</small>`;
     }
 }
+
 </script>
 </body>
 </html>
