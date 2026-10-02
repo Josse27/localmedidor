@@ -100,7 +100,7 @@ function buscar(){
         let lat = corrigirCoordenada(latOriginal);
         let lon = corrigirCoordenada(lonOriginal);
         
-        // LINKS DO GOOGLE MAPS CORRIGIDOS:
+                // LINKS DO GOOGLE MAPS TOTALMENTE CORRIGIDOS:
         div.innerHTML = `✅ <b>Encontrado:</b><br><br>
         <b>Inst:</b> ${inst}<br>
         <b>Medidor:</b> ${med}<br>
@@ -112,6 +112,7 @@ function buscar(){
         div.innerHTML = `❌ Não encontrado: <b>${v}</b><br><small>Nenhuma instalação ou medidor correspondente</small>`;
     }
 }
+
 </script>
 </body>
 </html>
