@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Local Medidor</title>
+<style>
+body{font-family:Arial;margin:0;height:100vh;display:flex;justify-content:center;align-items:center;background:#f0f2f5}
+.container{text-align:center;background:white;padding:30px;border-radius:10px;box-shadow:0 4px 10px rgba(0,0,0,.1);width:90%;max-width:400px}
+input{width:100%;padding:12px;margin:10px 0;box-sizing:border-box}button{width:100%;padding:12px;background:#003366;color:#fff;border:none;border-radius:5px;cursor:pointer}
+#resultado{margin-top:20px;text-align:left;background:#e8f0fe;padding:15px;border-radius:5px;display:none}
+</style>
+</head>
+<body>
+<div class="container">
+<h2>Buscar Instalação ou Medidor</h2>
+<input type="text" id="busca" placeholder="Digite instalação ou medidor">
+<button onclick="buscar()">Buscar</button>
+<div id="resultado"></div>
+</div>
+<script>
+let dados = [];
+fetch('dados.json').then(r=>r.json()).then(j=>{dados=j; console.log('Dados carregados:', dados.length)});
+function buscar(){
+  const valor = document.getElementById('busca').value.trim();
+  const div = document.getElementById('resultado');
+  if(!valor){div.style.display='block'; div.innerHTML='Digite algo'; return;}
+  const encontrado = dados.find(item => item.instalacao == valor || item.medidor == valor);
+  div.style.display='block';
+  if(encontrado){
+    div.innerHTML = `<b>✅ Encontrado:</b><br>Inst: ${encontrado.instalacao}<br>Medidor: ${encontrado.medidor}<br>Lat: ${encontrado.latitude}<br>Long: ${encontrado.longitude}<br><br><a href="https://www.google.com/maps?q=${encontrado.latitude},${encontrado.longitude}" target="_blank">📍 Abrir no Maps</a>`;
+  } else { div.innerHTML = `❌ Não encontrado: ${valor}`; }
+}
+</script>
+</body>
+</html>
