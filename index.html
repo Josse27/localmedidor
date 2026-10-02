@@ -67,7 +67,7 @@ function buscar(){
     let med=pega(achado,['medidor','med','numero_medidor']);
     div.innerHTML=`✅ <b>Encontrado:</b><br><br><b>Inst:</b> ${inst}<br><b>Medidor:</b> ${med}<br><b>Lat:</b> ${lat}<br><b>Long:</b> ${lon}<br><br><a class="btn" href="https://www.google.com/maps?q=${lat},${lon}" target="_blank">📍 Maps</a> <a class="btn" style="background:#4285F4;margin-left:5px" href="https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}" target="_blank">🚗 Rota</a>`;
   } else {
-    div.innerHTML=`❌ Não encontrado: <b>${v}</b><br><small>Verifique se no dados.json o campo está com outro nome</small>`;
+    div.innerHTML=`❌ Não encontrado: <b>${v}</b><br><small>Nenhuma instalacao ou medidor</small>`;
   }
 }
 </script>
