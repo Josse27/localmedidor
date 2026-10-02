@@ -30,7 +30,7 @@ fetch('dados.json')
     .then(r=>r.json())
     .then(j=>{
         dados=j;
-        document.getElementById('status').innerText=j.length.toLocaleString('pt-BR')+' registros carregados ✓ - teste 2222960293';
+        document.getElementById('status').innerText=j.length.toLocaleString('pt-BR')+' registros carregados ✓ ';
         console.log('Exemplo:', j[0]);
     }).catch(e=>{
         document.getElementById('status').innerText='Erro ao carregar dados.json ❌';
