@@ -67,7 +67,7 @@ function buscar(){
     let lon  = fix(a.longitude);  
     let med  = a.medidor;         
     
-    // HTML atualizado: Link corrigido e botão do Waze removido
+    // CORREÇÃO AQUI: Link do Google Maps ajustado com '/maps?q=' para abrir as coordenadas
     div.innerHTML = '<b>Inst:</b> ' + inst + '<br><b>Med:</b> ' + med + '<br><b>Lat:</b> ' + lat + '<br><b>Long:</b> ' + lon + '<br><br>' +
         '<button class="b" style="background:#25D366;color:#fff" onclick="window.open(\'https://google.com' + lat + ',' + lon + '\', \'_blank\')">📍 ABRIR NO MAPS</button>' +
         '<button class="b" style="background:#eee" onclick="navigator.clipboard.writeText(\'' + lat + ',' + lon + '\');alert(\'Copiado: ' + lat + ',' + lon + '\')">📋 COPIAR</button>';
