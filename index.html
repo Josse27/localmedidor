@@ -39,11 +39,13 @@ fetch('dados.json')
 
 function pega(item, nomes){
     if(Array.isArray(item)){
+        // Formato esperado do Array: [instalacao, latitude, longitude, medidor]
         if(nomes.some(n => ['instalacao','inst','instal','codigo'].includes(n.toLowerCase()))) return item[0];
         if(nomes.some(n => ['latitude','lat','y'].includes(n.toLowerCase()))) return item[1];
         if(nomes.some(n => ['longitude','long','lng','lon','x'].includes(n.toLowerCase()))) return item[2];
         if(nomes.some(n => ['medidor','med','numero_medidor'].includes(n.toLowerCase()))) return item[3];
     } else {
+        // Formato Objeto: {"instalacao": 123...}
         for(let k in item){
             for(let n of nomes){
                 if(k.toLowerCase()===n.toLowerCase()) return item[k];
@@ -98,13 +100,13 @@ function buscar(){
         let lat = corrigirCoordenada(latOriginal);
         let lon = corrigirCoordenada(lonOriginal);
         
-        // LINKS DO GOOGLE MAPS TOTALMENTE CORRIGIDOS ABAIXO:
+        // LINKS DO GOOGLE MAPS CORRIGIDOS:
         div.innerHTML = `✅ <b>Encontrado:</b><br><br>
         <b>Inst:</b> ${inst}<br>
         <b>Medidor:</b> ${med}<br>
         <b>Lat:</b> ${lat}<br>
         <b>Long:</b> ${lon}<br><br>
-        <a class="btn" href="https://google.com{lat},{lon}" target="_blank">📍 Maps</a> 
+        <a class="btn" href="https://google.com{lat},${lon}" target="_blank">📍 Maps</a> 
         <a class="btn" style="background:#4285F4;margin-left:5px" href="https://google.com{lat},${lon}" target="_blank">🚗 Rota</a>`;
     } else {
         div.innerHTML = `❌ Não encontrado: <b>${v}</b><br><small>Nenhuma instalação ou medidor correspondente</small>`;
@@ -113,8 +115,3 @@ function buscar(){
 </script>
 </body>
 </html>
-
-
-
-
-
