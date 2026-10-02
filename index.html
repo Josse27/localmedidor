@@ -73,3 +73,26 @@ function buscar(){
 </script>
 </body>
 </html>
+function buscar() {
+      const termo = document.getElementById("busca").value.trim();
+      const item = dados.find(d => d.instalacao === termo || d.medidor === termo);
+
+      if (item) {
+        document.getElementById("resultado").innerHTML = `
+          <strong>Instalacaoo:</strong> ${item.instalacao}<br>
+          <strong>Medidor:</strong> ${item.medidor}<br>
+          <strong>Latitude:</strong> ${item.latitude}<br>
+          <strong>Longitude:</strong> ${item.longitude}<br>
+          <a href="https://www.google.com/maps?q=${item.latitude},${item.longitude}" target="_blank">
+            Ver no Google Maps
+          </a>
+        `;
+      } else {
+        document.getElementById("resultado").innerHTML = "❌ Não encontrado.";
+      }
+    }
+  </script>
+</body>
+
+</html>
+
