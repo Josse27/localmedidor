@@ -4,31 +4,71 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Local Medidor</title>
 <style>
-body{font-family:Arial;margin:0;height:100vh;display:flex;justify-content:center;align-items:center;background:#f0f2f5}
-.container{text-align:center;background:white;padding:30px;border-radius:10px;box-shadow:0 4px 10px rgba(0,0,0,.1);width:90%;max-width:400px}
-input{width:100%;padding:12px;margin:10px 0;box-sizing:border-box}button{width:100%;padding:12px;background:#003366;color:#fff;border:none;border-radius:5px;cursor:pointer}
-#resultado{margin-top:20px;text-align:left;background:#e8f0fe;padding:15px;border-radius:5px;display:none}
+body{font-family:Arial;margin:0;min-height:100vh;display:flex;justify-content:center;align-items:center;background:#f0f2f5;padding:15px}
+.container{text-align:center;background:white;padding:25px;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,.1);width:100%;max-width:420px}
+h2{color:#003366}input{width:100%;padding:14px;margin:12px 0;border:2px solid #ddd;border-radius:8px;font-size:16px;box-sizing:border-box}
+button{width:100%;padding:14px;background:#003366;color:#fff;border:none;border-radius:8px;font-weight:bold;font-size:17px;cursor:pointer}
+#resultado{margin-top:20px;text-align:left;background:#e8f0fe;padding:15px;border-radius:8px;display:none;word-break:break-all}
+a.btn{display:inline-block;margin-top:10px;background:#25D366;color:#fff;padding:10px 15px;border-radius:6px;text-decoration:none;font-weight:bold}
+small{color:#666}
 </style>
 </head>
 <body>
 <div class="container">
 <h2>Buscar Instalação ou Medidor</h2>
-<input type="text" id="busca" placeholder="Digite instalação ou medidor">
+<small id="status">Carregando dados...</small>
+<input id="busca" placeholder="Digite instalação ou medidor">
 <button onclick="buscar()">Buscar</button>
 <div id="resultado"></div>
 </div>
 <script>
-let dados = [];
-fetch('dados.json').then(r=>r.json()).then(j=>{dados=j; console.log('Dados carregados:', dados.length)});
+let dados=[];
+fetch('dados.json').then(r=>r.json()).then(j=>{
+  dados=j;
+  document.getElementById('status').innerText=j.length.toLocaleString('pt-BR')+' registros carregados ✓ - teste 2222960293';
+  console.log('Exemplo:', j[0]);
+});
+
+function pega(item, nomes){
+  if(Array.isArray(item)){
+    // formato [instalacao, lat, long, medidor]
+    if(nomes[0]=='instalacao') return item[0];
+    if(nomes[0]=='latitude') return item[1];
+    if(nomes[0]=='longitude') return item[2];
+    if(nomes[0]=='medidor') return item[3];
+  } else {
+    // formato objeto {"instalacao":...} aceita maiusculo/minusculo
+    for(let k in item){
+      for(let n of nomes){
+        if(k.toLowerCase()===n.toLowerCase()) return item[k];
+      }
+    }
+  }
+  return '';
+}
+
 function buscar(){
-  const valor = document.getElementById('busca').value.trim();
-  const div = document.getElementById('resultado');
-  if(!valor){div.style.display='block'; div.innerHTML='Digite algo'; return;}
-  const encontrado = dados.find(item => item.instalacao == valor || item.medidor == valor);
+  const v=document.getElementById('busca').value.trim();
+  const div=document.getElementById('resultado');
+  if(!v){div.style.display='block';div.innerHTML='Digite algo';return;}
+  let achado=null;
+  for(let item of dados){
+    let inst=String(pega(item,['instalacao','inst','instal','codigo'])).trim();
+    let med=String(pega(item,['medidor','med','numero_medidor'])).trim();
+    if(inst===v || med===v || inst.includes(v) || med.includes(v)){
+      achado=item; break;
+    }
+  }
   div.style.display='block';
-  if(encontrado){
-    div.innerHTML = `<b>✅ Encontrado:</b><br>Inst: ${encontrado.instalacao}<br>Medidor: ${encontrado.medidor}<br>Lat: ${encontrado.latitude}<br>Long: ${encontrado.longitude}<br><br><a href="https://www.google.com/maps?q=${encontrado.latitude},${encontrado.longitude}" target="_blank">📍 Abrir no Maps</a>`;
-  } else { div.innerHTML = `❌ Não encontrado: ${valor}`; }
+  if(achado){
+    let inst=pega(achado,['instalacao','inst','instal','codigo']);
+    let lat=pega(achado,['latitude','lat','y']);
+    let lon=pega(achado,['longitude','long','lng','lon','x']);
+    let med=pega(achado,['medidor','med','numero_medidor']);
+    div.innerHTML=`✅ <b>Encontrado:</b><br><br><b>Inst:</b> ${inst}<br><b>Medidor:</b> ${med}<br><b>Lat:</b> ${lat}<br><b>Long:</b> ${lon}<br><br><a class="btn" href="https://www.google.com/maps?q=${lat},${lon}" target="_blank">📍 Maps</a> <a class="btn" style="background:#4285F4;margin-left:5px" href="https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}" target="_blank">🚗 Rota</a>`;
+  } else {
+    div.innerHTML=`❌ Não encontrado: <b>${v}</b><br><small>Verifique se no dados.json o campo está com outro nome</small>`;
+  }
 }
 </script>
 </body>
