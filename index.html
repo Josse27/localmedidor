@@ -1,62 +1,50 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Local Medidor</title>
-    <style>
-        body{font-family:Arial;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#f0f2f5;margin:0;padding:15px}
-        .box{background:#fff;padding:25px;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,.1);width:100%;max-width:420px;text-align:center}
-        h2{color:#003366}
-        input{width:100%;padding:14px;border:2px solid #ddd;border-radius:8px;font-size:16px;margin:10px 0;box-sizing:border-box}
-        button.b, a.b{width:100%;padding:14px;border:none;border-radius:8px;font-weight:bold;font-size:17px;cursor:pointer;margin-top:10px;display:block;text-decoration:none;box-sizing:border-box;text-align:center}
-        .buscar{background:#003366;color:#fff}
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Local Medidor</title>
+<style>body{font-family:Arial;background:#f0f2f5;margin:0;padding:15px;display:flex;justify-content:center}.box{background:#fff;padding:20px;border-radius:12px;width:100%;max-width:430px;text-align:center} input{width:100%;padding:14px;border:2px solid #ddd;border-radius:8px;box-sizing:border-box} a.b,button.b{width:100%;padding:14px;margin-top:10px;border:none;border-radius:8px;font-weight:bold;font-size:16px;display:block;text-decoration:none;box-sizing:border-box}.buscar{background:#003366;color:#fff}</style>
 </head>
 <body>
 <div class="box">
-    <h2>Buscar Instalação ou Medidor</h2>
-    <small id="st">Carregando...</small>
-    <input id="busca" placeholder="Digite instalação ou medidor">
-    <button class="b buscar" onclick="buscar()">Buscar</button>
-    <div id="r" style="display:none;margin-top:15px;background:#e8f0fe;padding:15px;border-radius:8px;text-align:left;word-break:break-all"></div>
+<h2 style="color:#003366">Buscar Medidor</h2>
+<small id="st" style="color:red">Carregando dados.json...</small><br>
+<input id="busca" placeholder="Ex: 111524">
+<button class="b buscar" onclick="buscar()">BUSCAR</button>
+<div id="r" style="display:none;margin-top:15px;background:#e8f0fe;padding:15px;border-radius:8px;text-align:left"></div>
 </div>
-
 <script>
 let D=[];
-fetch('dados.json').then(r=>r.json()).then(j=>{D=j;document.getElementById('st').innerText=j.length.toLocaleString('pt-BR')+' registros';});
-
-function fix(v){
-    if(!v) return '';
-    // Substitui vírgula por ponto e remove espaços
-    let s = String(v).replace(',', '.').trim();
-    // Garante que o valor retornado seja um número decimal válido
-    let n = parseFloat(s);
-    return isNaN(n) ? s : String(n);
-}
-
+fetch('./dados.json?v='+Date.now()).then(r=>{
+  if(!r.ok) throw new Error('dados.json não encontrado - status '+r.status);
+  return r.json();
+}).then(j=>{
+  D=j;
+  document.getElementById('st').innerText=j.length.toLocaleString('pt-BR')+' registros carregados';
+  document.getElementById('st').style.color='green';
+}).catch(e=>{
+  document.getElementById('st').innerText='ERRO: '+e.message;
+  document.getElementById('st').innerHTML+='<br>Verifique em github.com/josse27/localmedidor se o arquivo se chama exatamente dados.json';
+});
 function buscar(){
-    let q = document.getElementById('busca').value.trim().toLowerCase();
-    let div = document.getElementById('r');
-    if(!q){ div.style.display='block'; div.innerHTML='Digite algo'; return; }
-
-    let a=null;
-    for (let it of D) {
-        let valores = Object.values(it).join(' ').toLowerCase();
-        if (valores.includes(q)) { a=it; break; }
-    }
-    div.style.display='block';
-    if(!a){ div.innerHTML='❌ Não encontrado: '+document.getElementById('busca').value; return; }
-
-    let inst = a.instalacao || a.Instalacao || '';
-    let med = a.medidor || a.Medidor || '';
-    let lat = fix(a.latitude || a.Latitude || '');
-    let lon = fix(a.longitude || a.Longitude || '');
-
-    // HTML CORRIGIDO: Link formatado corretamente e sem o botão do Waze
-    div.innerHTML = '<b>Inst:</b> '+inst+'<br><b>Med:</b> '+med+'<br><b>Lat:</b> '+lat+'<br><b>Long:</b> '+lon+'<br><br>' +
-        '<a class="b" style="background:#25D366;color:#fff" href="https://google.com+'" target="_blank">📍 ABRIR NO MAPS</a>' +
-        '<button class="b" style="background:#eee;color:#000" onclick="navigator.clipboard.writeText(\''+lat+', '+lon+'\');alert(\'Copiado: '+lat+', '+lon+'\')">📋 COPIAR COORDENADAS</button>';
+  let q=document.getElementById('busca').value.trim().toLowerCase();
+  let div=document.getElementById('r');
+  div.style.display='block';
+  if(!D.length){div.innerHTML='Aguarde carregar dados...';return;}
+  if(!q){div.innerHTML='Digite instalação';return;}
+  let a=D.find(it=>String(it.instalacao||it.Instalacao||'').toLowerCase().includes(q) || String(it.medidor||'').toLowerCase().includes(q));
+  if(!a){div.innerHTML='❌ Não encontrado: '+q;return;}
+  let lat=String(a.latitude||'').replace(',','.'); let lon=String(a.longitude||'').replace(',','.');
+  // corrige -6.383.333
+  if((lat.match(/\./g)||[]).length>1){let p=lat.split('.');lat=p[0]+'.'+p.slice(1).join('');}
+  if((lon.match(/\./g)||[]).length>1){let p=lon.split('.');lon=p[0]+'.'+p.slice(1).join('');}
+  let inst=a.instalacao||a.Instalacao;
+  let med=a.medidor;
+  div.innerHTML=`<b>Inst:</b> ${inst}<br><b>Med:</b> ${med}<br><b>Lat:</b> ${lat}<br><b>Lon:</b> ${lon}<br><br>
+  <a class="b" style="background:#25D366;color:#fff" href="https://www.google.com/maps/search/?api=1&query=${lat},${lon}" target="_blank">📍 ABRIR NO MAPS</a>
+  <a class="b" style="background:#33CCFF" href="https://waze.com/ul?ll=${lat},${lon}&navigate=yes" target="_blank">🔵 WAZE</a>
+  <button class="b" style="background:#eee" onclick="navigator.clipboard.writeText('${lat},${lon}');alert('Copiado')">📋 COPIAR</button>`;
 }
 </script>
 </body>
