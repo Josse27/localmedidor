@@ -6,11 +6,11 @@
     <title>Local Medidor</title>
     <style>
         body{font-family:Arial;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#f0f2f5;margin:0;padding:15px}
-        .box{background:#fff;padding:25px;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,.1);width:100%;max-width:420px;text-align:center}
+       .box{background:#fff;padding:25px;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,.1);width:100%;max-width:420px;text-align:center}
         h2{color:#003366}
         input{width:100%;padding:14px;border:2px solid #ddd;border-radius:8px;font-size:16px;margin:10px 0;box-sizing:border-box}
-        button.b{width:100%;padding:14px;border:none;border-radius:8px;font-weight:bold;font-size:17px;cursor:pointer;margin-top:10px}
-        .buscar{background:#003366;color:#fff}
+        button.b, a.b{width:100%;padding:14px;border:none;border-radius:8px;font-weight:bold;font-size:17px;cursor:pointer;margin-top:10px;display:block;text-decoration:none;box-sizing:border-box}
+       .buscar{background:#003366;color:#fff}
     </style>
 </head>
 <body>
@@ -28,49 +28,37 @@ fetch('dados.json').then(r=>r.json()).then(j=>{D=j;document.getElementById('st')
 
 function fix(v){
     let s=String(v).replace(',','.').trim();
-    let p=s.split('.');
-    if(p.length<=2)return s;
+    if((s.match(/\./g)||[]).length<=1) return s;
     let neg=s.startsWith('-')?'-':'';
-    if(neg)p[0]=p[0].replace('-','');
+    if(neg) s=s.slice(1);
+    let p=s.split('.');
     return neg+p[0]+'.'+p.slice(1).join('');
 }
 
 function buscar(){
     let q = document.getElementById('busca').value.trim().toLowerCase();
     let div = document.getElementById('r');
-    
-    if(!q){
-        div.style.display = 'block';
-        div.innerHTML = 'Digite algo';
-        return;
-    }
-    
-    let a = null;
-    
+    if(!q){ div.style.display='block'; div.innerHTML='Digite algo'; return; }
+
+    let a=null;
     for (let it of D) {
-        let valoresConcatenados = Object.values(it).join(' ').toLowerCase();
-        if (valoresConcatenados.includes(q)) {
-            a = it;
-            break;
-        }
+        let valores = Object.values(it).join(' ').toLowerCase();
+        if (valores.includes(q)) { a=it; break; }
     }
-    
-    div.style.display = 'block';
-    
-    if(!a){
-        div.innerHTML = '❌ Não encontrado: ' + document.getElementById('busca').value;
-        return;
-    }
-    
-    let inst = a.Instalacao;       
-    let lat  = fix(a.latitude);   
-    let lon  = fix(a.longitude);  
-    let med  = a.medidor;         
-    
-    // CORREÇÃO AQUI: Link do Google Maps ajustado com '/maps?q=' para abrir as coordenadas
-    div.innerHTML = '<b>Inst:</b> ' + inst + '<br><b>Med:</b> ' + med + '<br><b>Lat:</b> ' + lat + '<br><b>Long:</b> ' + lon + '<br><br>' +
-        '<button class="b" style="background:#25D366;color:#fff" onclick="window.open(\'https://google.com' + lat + ',' + lon + '\', \'_blank\')">📍 ABRIR NO MAPS</button>' +
-        '<button class="b" style="background:#eee" onclick="navigator.clipboard.writeText(\'' + lat + ',' + lon + '\');alert(\'Copiado: ' + lat + ',' + lon + '\')">📋 COPIAR</button>';
+    div.style.display='block';
+    if(!a){ div.innerHTML='❌ Não encontrado: '+document.getElementById('busca').value; return; }
+
+    // aceita tanto maiusculo quanto minusculo
+    let inst = a.instalacao || a.Instalacao || '';
+    let med = a.medidor || a.Medidor || '';
+    let lat = fix(a.latitude || a.Latitude || '');
+    let lon = fix(a.longitude || a.Longitude || '');
+
+    div.innerHTML = '<b>Inst:</b> '+inst+'<br><b>Med:</b> '+med+'<br><b>Lat:</b> '+lat+'<br><b>Long:</b> '+lon+'<br><br>' +
+        // CORRIGIDO: link certo com <a> que abre 100% no celular
+        '<a class="b" style="background:#25D366;color:#fff" href="https://www.google.com/maps/search/?api=1&query='+lat+','+lon+'" target="_blank">📍 ABRIR NO MAPS</a>' +
+        '<a class="b" style="background:#33CCFF;color:#000" href="https://waze.com/ul?ll='+lat+','+lon+'&navigate=yes" target="_blank">🔵 ABRIR NO WAZE</a>' +
+        '<button class="b" style="background:#eee" onclick="navigator.clipboard.writeText(\''+lat+', '+lon+'\');alert(\'Copiado: '+lat+', '+lon+'\')">📋 COPIAR</button>';
 }
 </script>
 </body>
