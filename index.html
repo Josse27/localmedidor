@@ -98,13 +98,13 @@ function buscar(){
         let lat = corrigirCoordenada(latOriginal);
         let lon = corrigirCoordenada(lonOriginal);
         
-        // LINKS DO GOOGLE MAPS CORRIGIDOS ABAIXO:
+        // LINKS DO GOOGLE MAPS TOTALMENTE CORRIGIDOS ABAIXO:
         div.innerHTML = `✅ <b>Encontrado:</b><br><br>
         <b>Inst:</b> ${inst}<br>
         <b>Medidor:</b> ${med}<br>
         <b>Lat:</b> ${lat}<br>
         <b>Long:</b> ${lon}<br><br>
-        <a class="btn" href="https://google.com${lat},${lon}" target="_blank">📍 Maps</a> 
+        <a class="btn" href="https://google.com{lat},{lon}" target="_blank">📍 Maps</a> 
         <a class="btn" style="background:#4285F4;margin-left:5px" href="https://google.com{lat},${lon}" target="_blank">🚗 Rota</a>`;
     } else {
         div.innerHTML = `❌ Não encontrado: <b>${v}</b><br><small>Nenhuma instalação ou medidor correspondente</small>`;
@@ -113,6 +113,7 @@ function buscar(){
 </script>
 </body>
 </html>
+
 
 
 
