@@ -39,14 +39,11 @@ fetch('dados.json')
 
 function pega(item, nomes){
     if(Array.isArray(item)){
-        // formato [instalacao, lat, long, medidor]
-        // Verifica de forma flexível qual tipo de dado está sendo solicitado
         if(nomes.some(n => ['instalacao','inst','instal','codigo'].includes(n.toLowerCase()))) return item[0];
         if(nomes.some(n => ['latitude','lat','y'].includes(n.toLowerCase()))) return item[1];
         if(nomes.some(n => ['longitude','long','lng','lon','x'].includes(n.toLowerCase()))) return item[2];
         if(nomes.some(n => ['medidor','med','numero_medidor'].includes(n.toLowerCase()))) return item[3];
     } else {
-        // formato objeto {"instalacao":...}
         for(let k in item){
             for(let n of nomes){
                 if(k.toLowerCase()===n.toLowerCase()) return item[k];
@@ -82,25 +79,17 @@ function buscar(){
         let inst = pega(achado,['instalacao','inst','instal','codigo']);
         let med = pega(achado,['medidor','med','numero_medidor']);
         
-        // Captura as coordenadas originais
         let latOriginal = String(pega(achado,['latitude','lat','y'])).trim();
         let lonOriginal = String(pega(achado,['longitude','long','lng','lon','x'])).trim();
 
-        // FUNÇÃO PARA CORRIGIR OS PONTOS EXTRAS:
-        // Mantém o sinal de menos se houver, e garante apenas o primeiro ponto decimal
         const corrigirCoordenada = (numStr) => {
             let sinal = numStr.startsWith('-') ? '-' : '';
-            let limpo = numStr.replace(/[^0-9]/g, ''); // Remove tudo que não for número
+            let limpo = numStr.replace(/[^0-9]/g, ''); 
             if (limpo.length > 1) {
-                // Se a coordenada original começava com zero (ex: -0.123), o comportamento muda.
-                // Mas para a sua região (Caicó: Lat -6..., Long -37...), o primeiro dígito é o correto antes do ponto:
-                let indicePonto = numStr.startsWith('-') ? 1 : 1; 
-                
-                // Se for Longitude -37, precisamos de 2 dígitos antes do ponto
+                let indicePonto = 1; 
                 if (limpo.startsWith('37') || limpo.startsWith('38')) {
                     indicePonto = 2;
                 }
-                
                 return sinal + limpo.substring(0, indicePonto) + '.' + limpo.substring(indicePonto);
             }
             return numStr;
@@ -109,6 +98,7 @@ function buscar(){
         let lat = corrigirCoordenada(latOriginal);
         let lon = corrigirCoordenada(lonOriginal);
         
+        // LINKS DO GOOGLE MAPS TOTALMENTE CORRIGIDOS ABAIXO:
         div.innerHTML = `✅ <b>Encontrado:</b><br><br>
         <b>Inst:</b> ${inst}<br>
         <b>Medidor:</b> ${med}<br>
@@ -120,9 +110,9 @@ function buscar(){
         div.innerHTML = `❌ Não encontrado: <b>${v}</b><br><small>Nenhuma instalação ou medidor correspondente</small>`;
     }
 }
-
 </script>
 </body>
 </html>
+
 
 
